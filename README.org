@@ -1,3 +1,34 @@
+* READ PLEASE
+This is fork just removes =Makefile= because otherwise I wouldn't package it for NixOS however funny that sounds.
+
+If you want to install cp-p on NixOS then:
+1. In the same directory as =configuration.nix= make a file called =cp-p.nix= and paste contents from below into that file
+#+begin_src nix
+{ pkgs }:
+
+pkgs.stdenv.mkDerivation {
+  name = "cp-p";
+  src = pkgs.fetchFromGitHub {
+    owner = "deadendpl";
+    repo = "nix-cp-p";
+    rev = "414f7983dfd3abe8048363b2ca1019472802c5b5";
+    sha256 = "1vfjx3xh58ihll1sz3v3dmwjag9s0j50gxdzpql6frl1ilrdpwli";
+  };
+  installPhase = ''
+    mkdir -p $out/bin
+    cp cp-p mv-p $out/bin/
+  '';
+}
+#+end_src
+2. In your =configuration.nix= add that file to =enironment.systemPackages=
+#+begin_src nix
+environment.systemPackages = with pkgs; [
+  (import ./cp-p.nix { inherit pkgs; })
+  # wget
+  # ...
+#+end_src
+3. Reload your NixOS configuration with =sudo nixos-rebuild switch=.
+
 * cp-p: Unix cp (and mv), with progress
   As the title says... cp and mv that shows progress.
 
